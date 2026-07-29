@@ -102,21 +102,18 @@
 </div>
 
 <!-- ============ 테이블 번호 확인/입력 모달 ============ -->
-<!-- 변경점: 상단 잘림 방지 및 스크롤을 위한 구조 변경 (overflow-y-auto를 최상위에 배치) -->
 <div id="table-modal" class="fixed inset-0 z-40 bg-ink/60 hidden overflow-y-auto">
-  <!-- min-h-[100dvh]와 my-8 마진을 주어 내용이 길어도 상단이 잘리지 않고 스크롤되도록 처리 -->
   <div class="min-h-[100dvh] flex items-center justify-center p-4">
     <div class="bg-paper rounded-2xl w-full max-w-sm p-4 sm:p-5 shadow-lift fade-in my-8">
       <p class="text-center text-3xl mb-1">🏮</p>
       <h2 class="font-display text-xl sm:text-2xl text-center mb-1">테이블 번호를 확인해주세요</h2>
       <p class="text-center text-xs sm:text-sm text-ink/60 mb-4">테이블 위 QR코드를 다시 스캔하거나, 번호를 직접 선택해주세요</p>
 
-      <!-- 작은 화면에 맞춰 4열로 고정 및 패딩 축소 -->
       <div id="table-quick-grid" class="grid grid-cols-4 gap-1.5 mb-4"></div>
 
-      <div class="flex items-center gap-2 mb-4">
+      <div class="flex justify-center mb-4">
         <input id="table-manual-input" type="number" min="1" placeholder="직접 입력 (예: 7)"
-          class="flex-1 border-2 border-ink/15 rounded-xl px-3 py-2 text-base font-bold text-center focus:outline-none focus:border-flag">
+          class="w-2/3 border-2 border-ink/15 rounded-xl px-3 py-2 text-base font-bold text-center focus:outline-none focus:border-flag transition-colors">
       </div>
 
       <button id="table-confirm-btn" disabled
@@ -130,16 +127,12 @@
 <!-- ============ 메인 메뉴 화면 ============ -->
 <div id="view-menu" class="hidden pb-28">
 
-  <!-- 상단 배너: 글씨 깨짐 방지 -->
   <header class="relative bg-flag flag-edge text-paper pt-5 pb-6 px-4 mb-2">
-    <!-- 아이템 간격 조절 및 flex-1 적용 -->
     <div class="flex items-center justify-between gap-3">
       <div class="flex-1 min-w-0">
         <p class="text-[10px] tracking-widest text-paper/70 mb-0.5">2026 대동제 · 청춘주막</p>
-        <!-- 폰트 크기 조정 및 줄바꿈 강제(whitespace-nowrap) 활용 -->
         <h1 class="font-display text-xl sm:text-2xl leading-snug break-keep">오늘 여기,<br>주모가 쏜다 🍶</h1>
       </div>
-      <!-- 배지 크기 축소 -->
       <div class="bg-paper text-flag rounded-xl px-3 py-2 text-center shadow-card shrink-0">
         <p class="text-[10px] font-bold text-ink/50 leading-none mb-1">TABLE</p>
         <p id="table-badge" class="font-display text-2xl leading-none">-</p>
@@ -210,7 +203,8 @@
       <p class="font-display text-base mb-2">아래 계좌로 입금해주세요</p>
       <div class="bg-white/15 rounded-lg p-3 space-y-1 mb-3">
         <p class="text-xs text-paper/80"><span id="bank-name">-</span></p>
-        <p id="account-number" class="font-display text-xl tracking-wide">-</p>
+        <!-- 변경: text-xl -> text-lg 로 줄이고 여백 조정 -->
+        <p id="account-number" class="font-display text-lg tracking-widest">-</p>
         <p class="text-xs text-paper/80">예금주: <span id="account-holder">-</span></p>
       </div>
       <button id="copy-account-btn" class="w-full bg-paper text-flag font-bold py-2.5 rounded-lg text-sm active:scale-[0.98] transition-transform">
@@ -231,10 +225,11 @@
 
 <!-- ============ 주문 완료 화면 ============ -->
 <div id="view-complete" class="hidden min-h-screen flex flex-col items-center justify-center px-5 text-center fade-in">
-  <div class="stamp stamp-anim w-32 h-32 rounded-full flex flex-col items-center justify-center mb-5">
-    <p class="font-display text-xs">ORDER</p>
-    <p id="complete-order-number" class="font-display text-xl">-</p>
-    <p class="font-display text-xs mt-0.5">완료</p>
+  <!-- 변경: 원 크기 확대 (w-40 h-40), 내부 패딩 추가, break-all 적용 -->
+  <div class="stamp stamp-anim w-40 h-40 rounded-full flex flex-col items-center justify-center mb-5 px-3">
+    <p class="font-display text-[11px] opacity-80">ORDER</p>
+    <p id="complete-order-number" class="font-display text-lg leading-tight my-1 break-all">-</p>
+    <p class="font-display text-[11px] opacity-80">완료</p>
   </div>
   <h1 class="font-display text-2xl mb-2">주문이 접수됐어요!</h1>
   <p class="text-ink/60 text-sm mb-1">테이블 <span id="complete-table" class="font-bold">-</span>번, 조금만 기다려주세요 🍻</p>
@@ -310,7 +305,6 @@ function resolveTableNumber() {
 function openTableModal() {
   const grid = $('table-quick-grid');
   grid.innerHTML = '';
-  // 버튼 갯수를 모바일에 맞게 12개로 제한
   const quickCount = Math.min(CONFIG.MAX_TABLE, 12); 
   for (let i = 1; i <= quickCount; i++) {
     const btn = document.createElement('button');
@@ -351,12 +345,12 @@ function openTableModal() {
     url.searchParams.set('table', selected);
     window.history.replaceState({}, '', url);
     $('table-modal').classList.add('hidden');
-    $('table-modal').classList.remove('block'); // flex에서 block으로 변경된 구조 반영
+    $('table-modal').classList.remove('block'); 
     showMenuScreen();
   };
 
   $('table-modal').classList.remove('hidden');
-  $('table-modal').classList.add('block'); // overflow 스크롤을 위해 block 처리
+  $('table-modal').classList.add('block'); 
 }
 
 /* =========================================================
