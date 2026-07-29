@@ -101,20 +101,16 @@
   <p class="font-display text-base text-ink/70">메뉴판을 준비하는 중...</p>
 </div>
 
-<!-- ============ 테이블 번호 확인/입력 모달 ============ -->
+<!-- ============ 테이블 번호 확인/선택 모달 ============ -->
 <div id="table-modal" class="fixed inset-0 z-40 bg-ink/60 hidden overflow-y-auto">
   <div class="min-h-[100dvh] flex items-center justify-center p-4">
     <div class="bg-paper rounded-2xl w-full max-w-sm p-4 sm:p-5 shadow-lift fade-in my-8">
       <p class="text-center text-3xl mb-1">🏮</p>
       <h2 class="font-display text-xl sm:text-2xl text-center mb-1">테이블 번호를 확인해주세요</h2>
-      <p class="text-center text-xs sm:text-sm text-ink/60 mb-4">테이블 위 QR코드를 다시 스캔하거나, 번호를 직접 선택해주세요</p>
+      <p class="text-center text-xs sm:text-sm text-ink/60 mb-4">아래에서 현재 계신 테이블 번호를 선택해주세요</p>
 
-      <div id="table-quick-grid" class="grid grid-cols-4 gap-1.5 mb-4"></div>
-
-      <div class="flex justify-center mb-4">
-        <input id="table-manual-input" type="number" min="1" placeholder="직접 입력 (예: 7)"
-          class="w-2/3 border-2 border-ink/15 rounded-xl px-3 py-2 text-base font-bold text-center focus:outline-none focus:border-flag transition-colors">
-      </div>
+      <!-- 직접 입력창을 삭제하고 모든 테이블을 버튼으로 표시합니다 -->
+      <div id="table-quick-grid" class="grid grid-cols-4 gap-1.5 mb-5"></div>
 
       <button id="table-confirm-btn" disabled
         class="w-full bg-ink/20 text-white font-display text-lg py-3 rounded-xl transition-colors">
@@ -203,8 +199,8 @@
       <p class="font-display text-base mb-2">아래 계좌로 입금해주세요</p>
       <div class="bg-white/15 rounded-lg p-3 space-y-1 mb-3">
         <p class="text-xs text-paper/80"><span id="bank-name">-</span></p>
-        <!-- 변경: text-xl -> text-lg 로 줄이고 여백 조정 -->
-        <p id="account-number" class="font-display text-lg tracking-widest">-</p>
+        <!-- 변경: 폰트 크기를 text-base로 대폭 줄여 깨짐 방지 -->
+        <p id="account-number" class="font-display text-base tracking-wide">-</p>
         <p class="text-xs text-paper/80">예금주: <span id="account-holder">-</span></p>
       </div>
       <button id="copy-account-btn" class="w-full bg-paper text-flag font-bold py-2.5 rounded-lg text-sm active:scale-[0.98] transition-transform">
@@ -225,10 +221,10 @@
 
 <!-- ============ 주문 완료 화면 ============ -->
 <div id="view-complete" class="hidden min-h-screen flex flex-col items-center justify-center px-5 text-center fade-in">
-  <!-- 변경: 원 크기 확대 (w-40 h-40), 내부 패딩 추가, break-all 적용 -->
-  <div class="stamp stamp-anim w-40 h-40 rounded-full flex flex-col items-center justify-center mb-5 px-3">
+  <!-- 변경: 원 크기는 넉넉히(w-40 h-40), 텍스트는 축소(text-base) 및 줄바꿈 강제(break-all) -->
+  <div class="stamp stamp-anim w-40 h-40 rounded-full flex flex-col items-center justify-center mb-5 px-4 text-center">
     <p class="font-display text-[11px] opacity-80">ORDER</p>
-    <p id="complete-order-number" class="font-display text-lg leading-tight my-1 break-all">-</p>
+    <p id="complete-order-number" class="font-display text-base leading-tight my-1 break-all w-full">-</p>
     <p class="font-display text-[11px] opacity-80">완료</p>
   </div>
   <h1 class="font-display text-2xl mb-2">주문이 접수됐어요!</h1>
@@ -243,7 +239,6 @@
 <div id="toast" class="hidden fixed bottom-24 left-1/2 z-50 bg-ink text-paper text-xs font-bold px-4 py-2.5 rounded-full shadow-lift whitespace-nowrap"></div>
 
 <div id="error-screen" class="hidden fixed inset-0 z-50 bg-paper flex flex-col items-center justify-center px-6 text-center">
-  <p class="text-4xl mb-3">🥲</p>
   <h2 class="font-display text-xl mb-2">연결에 문제가 있어요</h2>
   <p id="error-message" class="text-ink/60 mb-5 text-xs">잠시 후 다시 시도해주세요</p>
   <button id="error-retry-btn" class="bg-flag text-paper font-bold text-sm px-5 py-2.5 rounded-lg">다시 시도</button>
@@ -259,7 +254,7 @@ const CONFIG = {
   BANK_NAME: "카카오뱅크",
   ACCOUNT_NUMBER: "3333-01-1234567",
   ACCOUNT_HOLDER: "홍길동",
-  MAX_TABLE: 30,
+  MAX_TABLE: 30, // 버튼으로 30번까지 모두 생성됩니다.
 };
 
 /* =========================================================
@@ -305,16 +300,15 @@ function resolveTableNumber() {
 function openTableModal() {
   const grid = $('table-quick-grid');
   grid.innerHTML = '';
-  const quickCount = Math.min(CONFIG.MAX_TABLE, 12); 
-  for (let i = 1; i <= quickCount; i++) {
+  // 직접 입력을 없앴으므로, MAX_TABLE 개수만큼 모두 버튼으로 생성합니다.
+  for (let i = 1; i <= CONFIG.MAX_TABLE; i++) {
     const btn = document.createElement('button');
     btn.textContent = i;
-    btn.className = 'py-1.5 rounded-lg border-2 border-ink/15 font-bold text-sm text-ink/70 active:bg-flag active:text-paper active:border-flag transition-colors';
+    btn.className = 'py-2 rounded-lg border-2 border-ink/15 font-bold text-sm text-ink/70 active:bg-flag active:text-paper active:border-flag transition-colors';
     btn.onclick = () => selectTableNumber(i, btn, grid);
     grid.appendChild(btn);
   }
 
-  const input = $('table-manual-input');
   const confirmBtn = $('table-confirm-btn');
   let selected = null;
 
@@ -325,14 +319,7 @@ function openTableModal() {
     confirmBtn.classList.add('bg-flag');
   }
 
-  input.oninput = () => {
-    [...grid.children].forEach(b => b.classList.remove('bg-flag', 'text-paper', 'border-flag'));
-    const n = parseInt(input.value, 10);
-    if (n > 0) enableConfirm(n); else { confirmBtn.disabled = true; confirmBtn.classList.add('bg-ink/20'); confirmBtn.classList.remove('bg-flag'); }
-  };
-
   window.selectTableNumber = (n, btn, grid) => {
-    input.value = '';
     [...grid.children].forEach(b => b.classList.remove('bg-flag', 'text-paper', 'border-flag'));
     btn.classList.add('bg-flag', 'text-paper', 'border-flag');
     enableConfirm(n);
@@ -539,7 +526,7 @@ function showCheckoutScreen() {
 
 function copyAccountNumber() {
   const text = CONFIG.ACCOUNT_NUMBER;
-  const done = () => showToast('계좌번호가 복사되었어요 ✅');
+  const done = () => showToast('계좌번호가 복사되었어요');
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
   } else {
