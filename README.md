@@ -102,12 +102,6 @@ const CONFIG = {
 4. **Source**를 `Deploy from a branch`로 설정 → Branch: `main`, 폴더: `/(root)` 선택 후 저장.
 5. 1~2분 후 `https://[깃허브아이디].github.io/jumak-order/` 형태의 주소가 생성됩니다.
 
-### (대안) Vercel로 호스팅하기
-
-1. [vercel.com](https://vercel.com)에 가입 후 `New Project` → 위 GitHub 저장소를 import.
-2. Framework Preset은 `Other`로 두고 바로 Deploy.
-3. 배포 완료 후 `https://jumak-order.vercel.app` 형태의 주소가 발급됩니다.
-
 ---
 
 ## STEP 6. 테이블별 QR 코드 생성
