@@ -45,7 +45,6 @@
   ::-webkit-scrollbar { display: none; }
   * { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* 찢어진 천/깃발 느낌의 하단 지그재그 */
   .flag-edge::after {
     content: '';
     position: absolute;
@@ -103,40 +102,47 @@
 </div>
 
 <!-- ============ 테이블 번호 확인/입력 모달 ============ -->
-<div id="table-modal" class="fixed inset-0 z-40 bg-ink/60 hidden items-center justify-center p-4">
-  <div class="bg-paper rounded-2xl w-full max-w-sm p-5 shadow-lift fade-in">
-    <p class="text-center text-3xl mb-1">🏮</p>
-    <h2 class="font-display text-xl sm:text-2xl text-center mb-1">테이블 번호를 확인해주세요</h2>
-    <p class="text-center text-xs sm:text-sm text-ink/60 mb-4">테이블 위 QR코드를 다시 스캔하거나, 번호를 직접 선택해주세요</p>
+<!-- 변경점: 상단 잘림 방지 및 스크롤을 위한 구조 변경 (overflow-y-auto를 최상위에 배치) -->
+<div id="table-modal" class="fixed inset-0 z-40 bg-ink/60 hidden overflow-y-auto">
+  <!-- min-h-[100dvh]와 my-8 마진을 주어 내용이 길어도 상단이 잘리지 않고 스크롤되도록 처리 -->
+  <div class="min-h-[100dvh] flex items-center justify-center p-4">
+    <div class="bg-paper rounded-2xl w-full max-w-sm p-4 sm:p-5 shadow-lift fade-in my-8">
+      <p class="text-center text-3xl mb-1">🏮</p>
+      <h2 class="font-display text-xl sm:text-2xl text-center mb-1">테이블 번호를 확인해주세요</h2>
+      <p class="text-center text-xs sm:text-sm text-ink/60 mb-4">테이블 위 QR코드를 다시 스캔하거나, 번호를 직접 선택해주세요</p>
 
-    <!-- 작은 화면에서는 4칸, 약간 크면 5칸 -->
-    <div id="table-quick-grid" class="grid grid-cols-4 sm:grid-cols-5 gap-1.5 mb-4"></div>
+      <!-- 작은 화면에 맞춰 4열로 고정 및 패딩 축소 -->
+      <div id="table-quick-grid" class="grid grid-cols-4 gap-1.5 mb-4"></div>
 
-    <div class="flex items-center gap-2 mb-4">
-      <input id="table-manual-input" type="number" min="1" placeholder="직접 입력 (예: 7)"
-        class="flex-1 border-2 border-ink/15 rounded-xl px-3 py-2 text-base sm:text-lg font-bold text-center focus:outline-none focus:border-flag">
+      <div class="flex items-center gap-2 mb-4">
+        <input id="table-manual-input" type="number" min="1" placeholder="직접 입력 (예: 7)"
+          class="flex-1 border-2 border-ink/15 rounded-xl px-3 py-2 text-base font-bold text-center focus:outline-none focus:border-flag">
+      </div>
+
+      <button id="table-confirm-btn" disabled
+        class="w-full bg-ink/20 text-white font-display text-lg py-3 rounded-xl transition-colors">
+        이 테이블로 입장하기
+      </button>
     </div>
-
-    <button id="table-confirm-btn" disabled
-      class="w-full bg-ink/20 text-white font-display text-lg sm:text-xl py-3 rounded-xl transition-colors">
-      이 테이블로 입장하기
-    </button>
   </div>
 </div>
 
 <!-- ============ 메인 메뉴 화면 ============ -->
 <div id="view-menu" class="hidden pb-28">
 
-  <!-- 상단 배너: 찢어진 깃발 스타일 -->
+  <!-- 상단 배너: 글씨 깨짐 방지 -->
   <header class="relative bg-flag flag-edge text-paper pt-5 pb-6 px-4 mb-2">
-    <div class="flex items-start justify-between">
-      <div>
-        <p class="text-[10px] sm:text-xs tracking-widest text-paper/70 mb-0.5">2026 대동제 · 청춘주막</p>
-        <h1 class="font-display text-2xl sm:text-3xl leading-tight">오늘 여기,<br>주모가 쏜다 🍶</h1>
+    <!-- 아이템 간격 조절 및 flex-1 적용 -->
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex-1 min-w-0">
+        <p class="text-[10px] tracking-widest text-paper/70 mb-0.5">2026 대동제 · 청춘주막</p>
+        <!-- 폰트 크기 조정 및 줄바꿈 강제(whitespace-nowrap) 활용 -->
+        <h1 class="font-display text-xl sm:text-2xl leading-snug break-keep">오늘 여기,<br>주모가 쏜다 🍶</h1>
       </div>
-      <div class="bg-paper text-flag rounded-xl px-3 py-2 sm:px-4 sm:py-3 text-center shadow-card shrink-0 ml-2">
-        <p class="text-[10px] sm:text-[11px] font-bold text-ink/50 leading-none mb-1">TABLE</p>
-        <p id="table-badge" class="font-display text-2xl sm:text-3xl leading-none">-</p>
+      <!-- 배지 크기 축소 -->
+      <div class="bg-paper text-flag rounded-xl px-3 py-2 text-center shadow-card shrink-0">
+        <p class="text-[10px] font-bold text-ink/50 leading-none mb-1">TABLE</p>
+        <p id="table-badge" class="font-display text-2xl leading-none">-</p>
       </div>
     </div>
   </header>
@@ -151,10 +157,10 @@
   <div id="cart-bar" class="hidden fixed left-0 right-0 bottom-0 z-30 px-3 pb-3">
     <button id="cart-bar-btn" class="w-full bg-night text-paper rounded-xl shadow-lift px-4 py-3 flex items-center justify-between active:scale-[0.98] transition-transform">
       <span class="flex items-center gap-2 font-bold text-sm sm:text-base">
-        <span id="cart-count" class="bg-flag text-paper text-xs sm:text-sm w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center font-display">0</span>
+        <span id="cart-count" class="bg-flag text-paper text-xs w-5 h-5 rounded-full flex items-center justify-center font-display">0</span>
         장바구니 보기
       </span>
-      <span id="cart-total" class="font-display text-lg sm:text-xl text-gold">0원</span>
+      <span id="cart-total" class="font-display text-lg text-gold">0원</span>
     </button>
   </div>
 </div>
@@ -163,16 +169,16 @@
 <div id="cart-drawer-overlay" class="hidden fixed inset-0 z-40 bg-ink/60"></div>
 <div id="cart-drawer" class="hidden fixed left-0 right-0 bottom-0 z-50 bg-paper rounded-t-2xl max-h-[85vh] flex flex-col sheet-in">
   <div class="flex items-center justify-between px-4 pt-4 pb-3 border-b border-ink/10">
-    <h2 class="font-display text-xl sm:text-2xl">장바구니</h2>
+    <h2 class="font-display text-xl">장바구니</h2>
     <button id="cart-close-btn" class="text-ink/40 text-2xl leading-none px-2">&times;</button>
   </div>
   <div id="cart-items" class="flex-1 overflow-y-auto px-4 py-2 space-y-3"></div>
   <div class="px-4 pt-3 pb-5 border-t border-ink/10 bg-paper">
     <div class="flex justify-between items-center mb-3">
-      <span class="text-ink/60 font-bold text-sm sm:text-base">총 결제금액</span>
-      <span id="cart-drawer-total" class="font-display text-xl sm:text-2xl text-flag">0원</span>
+      <span class="text-ink/60 font-bold text-sm">총 결제금액</span>
+      <span id="cart-drawer-total" class="font-display text-xl text-flag">0원</span>
     </div>
-    <button id="goto-checkout-btn" class="w-full bg-flag text-paper font-display text-lg sm:text-xl py-3 rounded-xl active:scale-[0.98] transition-transform disabled:opacity-40">
+    <button id="goto-checkout-btn" class="w-full bg-flag text-paper font-display text-lg py-3 rounded-xl active:scale-[0.98] transition-transform disabled:opacity-40">
       주문하기
     </button>
   </div>
@@ -182,42 +188,42 @@
 <div id="view-checkout" class="hidden min-h-screen pb-8">
   <header class="bg-night text-paper px-4 pt-5 pb-4 flex items-center gap-2">
     <button id="checkout-back-btn" class="text-xl px-1">&larr;</button>
-    <h1 class="font-display text-xl sm:text-2xl">주문 확인 &amp; 입금 안내</h1>
+    <h1 class="font-display text-xl">주문 확인 &amp; 입금 안내</h1>
   </header>
 
   <main class="px-4 pt-4 space-y-3">
     <!-- 주문 요약 카드 -->
     <section class="bg-white rounded-xl shadow-card p-4">
       <div class="flex justify-between items-center mb-2">
-        <h2 class="font-bold text-base sm:text-lg">주문 내역</h2>
-        <span class="bg-ink/5 text-ink/60 text-xs sm:text-sm font-bold px-2 py-1 rounded-full">테이블 <span id="checkout-table">-</span>번</span>
+        <h2 class="font-bold text-base">주문 내역</h2>
+        <span class="bg-ink/5 text-ink/60 text-xs font-bold px-2 py-1 rounded-full">테이블 <span id="checkout-table">-</span>번</span>
       </div>
       <div id="checkout-items" class="divide-y divide-ink/10"></div>
       <div class="flex justify-between items-center pt-3 mt-2 border-t-2 border-ink/10">
-        <span class="font-bold text-sm sm:text-base">총 금액</span>
-        <span id="checkout-total" class="font-display text-xl sm:text-2xl text-flag">0원</span>
+        <span class="font-bold text-sm">총 금액</span>
+        <span id="checkout-total" class="font-display text-xl text-flag">0원</span>
       </div>
     </section>
 
     <!-- 입금 계좌 카드 (강조) -->
     <section class="bg-flag text-paper rounded-xl shadow-lift p-4 relative overflow-hidden">
-      <p class="font-display text-base sm:text-lg mb-2">아래 계좌로 입금해주세요</p>
+      <p class="font-display text-base mb-2">아래 계좌로 입금해주세요</p>
       <div class="bg-white/15 rounded-lg p-3 space-y-1 mb-3">
-        <p class="text-xs sm:text-sm text-paper/80"><span id="bank-name">-</span></p>
-        <p id="account-number" class="font-display text-xl sm:text-2xl tracking-wide">-</p>
-        <p class="text-xs sm:text-sm text-paper/80">예금주: <span id="account-holder">-</span></p>
+        <p class="text-xs text-paper/80"><span id="bank-name">-</span></p>
+        <p id="account-number" class="font-display text-xl tracking-wide">-</p>
+        <p class="text-xs text-paper/80">예금주: <span id="account-holder">-</span></p>
       </div>
-      <button id="copy-account-btn" class="w-full bg-paper text-flag font-bold py-2.5 rounded-lg text-sm sm:text-base active:scale-[0.98] transition-transform">
+      <button id="copy-account-btn" class="w-full bg-paper text-flag font-bold py-2.5 rounded-lg text-sm active:scale-[0.98] transition-transform">
         계좌번호 복사하기
       </button>
-      <p class="text-[11px] sm:text-xs text-paper/80 mt-3 text-center leading-relaxed">입금자명은 <b>테이블 번호 + 이름</b>으로 남겨주시면<br>확인이 훨씬 빨라요!</p>
+      <p class="text-[11px] text-paper/80 mt-3 text-center leading-relaxed">입금자명은 <b>테이블 번호 + 이름</b>으로 남겨주시면<br>확인이 훨씬 빨라요!</p>
     </section>
 
     <div class="bg-gold/15 border border-gold/40 rounded-xl p-3 text-center">
-      <p class="font-bold text-ink/80 text-xs sm:text-sm">입금 후, 아래 버튼을 눌러 주문을 완료해주세요</p>
+      <p class="font-bold text-ink/80 text-xs">입금 후, 아래 버튼을 눌러 주문을 완료해주세요</p>
     </div>
 
-    <button id="submit-order-btn" class="w-full bg-ink text-paper font-display text-lg sm:text-xl py-4 rounded-xl shadow-lift active:scale-[0.98] transition-transform">
+    <button id="submit-order-btn" class="w-full bg-ink text-paper font-display text-lg py-4 rounded-xl shadow-lift active:scale-[0.98] transition-transform">
       입금 완료, 주문 완료하기
     </button>
   </main>
@@ -225,26 +231,26 @@
 
 <!-- ============ 주문 완료 화면 ============ -->
 <div id="view-complete" class="hidden min-h-screen flex flex-col items-center justify-center px-5 text-center fade-in">
-  <div class="stamp stamp-anim w-32 h-32 sm:w-40 sm:h-40 rounded-full flex flex-col items-center justify-center mb-5">
-    <p class="font-display text-xs sm:text-sm">ORDER</p>
-    <p id="complete-order-number" class="font-display text-xl sm:text-2xl">-</p>
-    <p class="font-display text-xs sm:text-sm mt-0.5">완료</p>
+  <div class="stamp stamp-anim w-32 h-32 rounded-full flex flex-col items-center justify-center mb-5">
+    <p class="font-display text-xs">ORDER</p>
+    <p id="complete-order-number" class="font-display text-xl">-</p>
+    <p class="font-display text-xs mt-0.5">완료</p>
   </div>
-  <h1 class="font-display text-2xl sm:text-3xl mb-2">주문이 접수됐어요!</h1>
-  <p class="text-ink/60 text-sm sm:text-base mb-1">테이블 <span id="complete-table" class="font-bold">-</span>번, 조금만 기다려주세요 🍻</p>
-  <p class="text-ink/40 text-xs sm:text-sm mb-6">입금 확인 후 순서대로 서빙해드립니다</p>
-  <button id="new-order-btn" class="bg-night text-paper font-bold text-sm sm:text-base px-5 py-2.5 rounded-lg">
+  <h1 class="font-display text-2xl mb-2">주문이 접수됐어요!</h1>
+  <p class="text-ink/60 text-sm mb-1">테이블 <span id="complete-table" class="font-bold">-</span>번, 조금만 기다려주세요 🍻</p>
+  <p class="text-ink/40 text-xs mb-6">입금 확인 후 순서대로 서빙해드립니다</p>
+  <button id="new-order-btn" class="bg-night text-paper font-bold text-sm px-5 py-2.5 rounded-lg">
     추가 주문하기
   </button>
 </div>
 
 <!-- ============ 에러/토스트 ============ -->
-<div id="toast" class="hidden fixed bottom-24 left-1/2 z-50 bg-ink text-paper text-xs sm:text-sm font-bold px-4 py-2.5 rounded-full shadow-lift whitespace-nowrap"></div>
+<div id="toast" class="hidden fixed bottom-24 left-1/2 z-50 bg-ink text-paper text-xs font-bold px-4 py-2.5 rounded-full shadow-lift whitespace-nowrap"></div>
 
 <div id="error-screen" class="hidden fixed inset-0 z-50 bg-paper flex flex-col items-center justify-center px-6 text-center">
   <p class="text-4xl mb-3">🥲</p>
   <h2 class="font-display text-xl mb-2">연결에 문제가 있어요</h2>
-  <p id="error-message" class="text-ink/60 mb-5 text-xs sm:text-sm">잠시 후 다시 시도해주세요</p>
+  <p id="error-message" class="text-ink/60 mb-5 text-xs">잠시 후 다시 시도해주세요</p>
   <button id="error-retry-btn" class="bg-flag text-paper font-bold text-sm px-5 py-2.5 rounded-lg">다시 시도</button>
 </div>
 
@@ -304,12 +310,12 @@ function resolveTableNumber() {
 function openTableModal() {
   const grid = $('table-quick-grid');
   grid.innerHTML = '';
-  const quickCount = Math.min(CONFIG.MAX_TABLE, 16);
+  // 버튼 갯수를 모바일에 맞게 12개로 제한
+  const quickCount = Math.min(CONFIG.MAX_TABLE, 12); 
   for (let i = 1; i <= quickCount; i++) {
     const btn = document.createElement('button');
     btn.textContent = i;
-    // 아이폰 8에 맞게 패딩과 글씨 크기 조정
-    btn.className = 'py-2 sm:py-2.5 rounded-lg sm:rounded-xl border-2 border-ink/15 font-bold text-sm sm:text-base text-ink/70 active:bg-flag active:text-paper active:border-flag transition-colors';
+    btn.className = 'py-1.5 rounded-lg border-2 border-ink/15 font-bold text-sm text-ink/70 active:bg-flag active:text-paper active:border-flag transition-colors';
     btn.onclick = () => selectTableNumber(i, btn, grid);
     grid.appendChild(btn);
   }
@@ -345,12 +351,12 @@ function openTableModal() {
     url.searchParams.set('table', selected);
     window.history.replaceState({}, '', url);
     $('table-modal').classList.add('hidden');
-    $('table-modal').classList.remove('flex');
+    $('table-modal').classList.remove('block'); // flex에서 block으로 변경된 구조 반영
     showMenuScreen();
   };
 
   $('table-modal').classList.remove('hidden');
-  $('table-modal').classList.add('flex');
+  $('table-modal').classList.add('block'); // overflow 스크롤을 위해 block 처리
 }
 
 /* =========================================================
@@ -386,7 +392,7 @@ function renderCategoryTabs() {
   state.categories.forEach(cat => {
     const btn = document.createElement('button');
     btn.textContent = cat;
-    btn.className = 'shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full font-bold text-xs sm:text-sm border-2 transition-colors ' +
+    btn.className = 'shrink-0 px-3 py-1.5 rounded-full font-bold text-xs border-2 transition-colors ' +
       (cat === state.activeCategory
         ? 'bg-flag text-paper border-flag'
         : 'bg-transparent text-ink/50 border-ink/15');
@@ -403,17 +409,16 @@ function renderMenuList() {
   items.forEach(item => {
     const inCart = state.cart[item.id];
     const card = document.createElement('div');
-    // 패딩 및 간격 축소
-    card.className = 'menu-card bg-white rounded-xl shadow-card p-3 flex items-center gap-2 sm:gap-3' + (item.soldOut ? ' sold-out' : '');
+    card.className = 'menu-card bg-white rounded-xl shadow-card p-3 flex items-center gap-2' + (item.soldOut ? ' sold-out' : '');
 
     card.innerHTML = `
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-1.5 mb-0.5">
-          <h3 class="font-bold text-sm sm:text-base truncate">${escapeHtml(item.name)}</h3>
+          <h3 class="font-bold text-sm truncate">${escapeHtml(item.name)}</h3>
           ${item.soldOut ? '<span class="shrink-0 text-[10px] font-bold bg-ink/70 text-paper px-1.5 py-0.5 rounded-full">품절</span>' : ''}
         </div>
-        <p class="text-[11px] sm:text-xs text-ink/50 mb-1 line-clamp-2">${escapeHtml(item.description || '')}</p>
-        <p class="font-display text-base sm:text-lg text-gold">${won(item.price)}</p>
+        <p class="text-[11px] text-ink/50 mb-1 line-clamp-2">${escapeHtml(item.description || '')}</p>
+        <p class="font-display text-base text-gold">${won(item.price)}</p>
       </div>
       <div class="shrink-0" data-qty-area></div>
     `;
@@ -429,20 +434,18 @@ function renderMenuList() {
 function renderQtyControl(container, item) {
   const entry = state.cart[item.id];
   if (item.soldOut) {
-    container.innerHTML = `<button class="w-14 sm:w-16 py-1.5 sm:py-2 rounded-lg bg-ink/10 text-ink/30 font-bold text-xs" disabled>품절</button>`;
+    container.innerHTML = `<button class="w-14 py-1.5 rounded-lg bg-ink/10 text-ink/30 font-bold text-xs" disabled>품절</button>`;
     return;
   }
   if (!entry) {
-    // 버튼 크기 및 폰트 사이즈 조절
-    container.innerHTML = `<button class="qty-btn w-14 sm:w-16 py-1.5 sm:py-2 rounded-lg bg-night text-paper font-bold text-xs sm:text-sm active:scale-95 transition-transform">담기</button>`;
+    container.innerHTML = `<button class="qty-btn w-14 py-1.5 rounded-lg bg-night text-paper font-bold text-xs active:scale-95 transition-transform">담기</button>`;
     container.querySelector('button').onclick = () => { addToCart(item); renderMenuList(); };
   } else {
-    // 수량 조절 버튼 크기 축소
     container.innerHTML = `
       <div class="flex items-center gap-1 bg-ink/5 rounded-lg p-1">
-        <button data-act="minus" class="qty-btn w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-white shadow-sm font-bold text-sm sm:text-base">-</button>
-        <span class="w-4 sm:w-5 text-center font-bold text-xs sm:text-sm">${entry.qty}</span>
-        <button data-act="plus" class="qty-btn w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-white shadow-sm font-bold text-sm sm:text-base">+</button>
+        <button data-act="minus" class="qty-btn w-6 h-6 rounded-md bg-white shadow-sm font-bold text-sm">-</button>
+        <span class="w-4 text-center font-bold text-xs">${entry.qty}</span>
+        <button data-act="plus" class="qty-btn w-6 h-6 rounded-md bg-white shadow-sm font-bold text-sm">+</button>
       </div>`;
     container.querySelector('[data-act=minus]').onclick = () => { changeQty(item.id, -1); renderMenuList(); };
     container.querySelector('[data-act=plus]').onclick = () => { changeQty(item.id, 1); renderMenuList(); };
@@ -498,13 +501,13 @@ function renderCartDrawer() {
     row.className = 'flex items-center justify-between';
     row.innerHTML = `
       <div class="min-w-0 pr-2">
-        <p class="font-bold text-sm sm:text-base truncate">${escapeHtml(item.name)}</p>
-        <p class="text-xs sm:text-sm text-ink/50">${won(item.price)}</p>
+        <p class="font-bold text-sm truncate">${escapeHtml(item.name)}</p>
+        <p class="text-xs text-ink/50">${won(item.price)}</p>
       </div>
       <div class="flex items-center gap-1 bg-ink/5 rounded-lg p-1 shrink-0">
-        <button data-act="minus" class="qty-btn w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-white shadow-sm font-bold text-sm sm:text-base">-</button>
-        <span class="w-4 sm:w-5 text-center font-bold text-xs sm:text-sm">${qty}</span>
-        <button data-act="plus" class="qty-btn w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-white shadow-sm font-bold text-sm sm:text-base">+</button>
+        <button data-act="minus" class="qty-btn w-6 h-6 rounded-md bg-white shadow-sm font-bold text-sm">-</button>
+        <span class="w-4 text-center font-bold text-xs">${qty}</span>
+        <button data-act="plus" class="qty-btn w-6 h-6 rounded-md bg-white shadow-sm font-bold text-sm">+</button>
       </div>
     `;
     row.querySelector('[data-act=minus]').onclick = () => { changeQty(item.id, -1); renderCartDrawer(); updateCartBar(); };
@@ -527,7 +530,7 @@ function showCheckoutScreen() {
   wrap.innerHTML = '';
   cartArray().forEach(({ item, qty }) => {
     const row = document.createElement('div');
-    row.className = 'flex justify-between py-2 text-xs sm:text-sm';
+    row.className = 'flex justify-between py-2 text-xs';
     row.innerHTML = `<span>${escapeHtml(item.name)} <span class="text-ink/40">x${qty}</span></span><span class="font-bold">${won(item.price * qty)}</span>`;
     wrap.appendChild(row);
   });
